@@ -1,4 +1,4 @@
-"Carimbo de data/hora","1- Qual sua idade?","2- Qual seu estado civil?","3- Qual sua raça?","4- Você trabalha?","5- Qual seu nível de escolaridade?","6- Qual sua renda própria?","7- Em qual desses candidatos você votou no primeiro turno?","8- Em qual candidato você não votaria de jeito nenhum?"
+"Carimbo de data/hora","1_idade","2_estado_civil","3_cor_pele","4_trabalha","5_escolaridade","6_renda","7_voto","8_nao_voto"
 "2018/11/01 9:11:06 PM GMT-2","31-40","Casado","Branco","Período integral","Ensino superior completo","Entre 1000 - 2000 reais","Jair Bolsonaro","Fernando Haddad"
 "2018/11/01 9:19:27 PM GMT-2","21-30","Namorando","Branco","Período integral","Ensino superior incompleto","Entre 1000 - 2000 reais","Jair Bolsonaro","Fernando Haddad"
 "2018/11/01 9:34:53 PM GMT-2","21-30","Namorando","Branco","Meio período","Ensino superior incompleto","Entre 1000 - 2000 reais","Não votou em nenhum dos citados","Fernando Haddad"
