@@ -36,7 +36,10 @@ def arvore(matriz, colunas, coluna_alvo):
             for i, valor in enumerate(linha):
                 if (i != coluna_alvo):
                     if (colunas[i] not in arvore[resultado].keys()):
-                        arvore[resultado][colunas[i]] = {val: {"sims": 0, "naos": 0, "entropia": None, "matriz": []} for val in possiveis_resultados(matriz, i)}
+                        arvore[resultado][colunas[i]] = {val: {"sims": 0.0, "naos": 0.0, "entropia": None, "matriz": []} for val in possiveis_resultados(matriz, i)}
+                    #     arvore[resultado][colunas[i]] = {val: {"sims": 0.0, "naos": 0.0, "entropia": None, "matriz": [linha]} for val in possiveis_resultados(matriz, i)}
+                    # else:
+                    #     arvore[resultado][colunas[i]][valor]["matriz"].append(linha)
                     if (linha[coluna_alvo] == resultado):
                         arvore[resultado][colunas[i]][valor]["sims"] += 1
                     else:
@@ -53,14 +56,6 @@ def arvore(matriz, colunas, coluna_alvo):
 pp.pprint(arvore(matriz, colunas, coluna_alvo))
 
 
-# def dados_col(idx, matriz):
-#     dados = []
-#     for linha in matriz:
-#         for i, valor in enumerate(linha):
-#             if i == idx and valor not in dados:
-#                 dados.append(valor)
-#     return {val: 0.0 for val in dados}
-
 # def entropias(valores):
 #     total = sum(valores)
 #     return map(lambda x: entropia(x, total), valores)
@@ -69,10 +64,6 @@ pp.pprint(arvore(matriz, colunas, coluna_alvo))
 # # coluna_alvo = colunas[0:coluna_alvo-1]+colunas[coluna_alvo+1:len(matriz)]
 # # matriz_alvo = list(map(lambda x: x[0:coluna_alvo-1]+x[coluna_alvo+1:len(matriz)], matriz))
 
-# dados = {col: dados_col(idx, matriz) for idx, col in enumerate(colunas)}
-# for linha in matriz:
-#     for idx, val in enumerate(linha):
-#         dados[colunas[idx]][val] += 1
 
 # resultados = dados[colunas[-2]]
 # dados = {k: v for k, v in dados.items() if not k.startswith('7_')}
