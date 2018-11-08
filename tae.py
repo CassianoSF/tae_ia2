@@ -1,92 +1,91 @@
 # -*- coding: utf-8 -*-
-import pprint
-import math
-pp = pprint.PrettyPrinter(indent=4)
 
+import math
+import pprint
 
 def trata_linha(linha):
-    return linha.replace("\"", "").replace("ã", "a").replace("ç", "c").replace("í", "i").replace("é", "e").replace("ó", "o").split(",")
+    return linha.replace("\"", "").replace("\n", "").replace("ã", "a").replace("ç", "c").replace("í", "i").replace("é", "e").replace("ó", "o").split(",")
 
+def totais_col(idx, matriz):
+    totais = []
+    for linha in matriz:
+        for i, valor in enumerate(linha):
+            if i == idx and valor not in totais:
+                totais.append(valor)
+    return {val: 0.0 for val in totais}
+
+def entropia(resultados):
+    valores = resultados.values()
+    total = sum(valores)
+    entropia = 0.0
+    for res in valores:
+        if not (res == 0):
+            entropia += -(res/total)*math.log(res/total, 2)
+    return entropia
+
+def struct(matriz, colunas):
+    totais = {col: totais_col(idx, matriz) for idx, col in enumerate(colunas)}
+    for linha in matriz:
+        for idx, val in enumerate(linha):
+            totais[colunas[idx]][val] += 1
+    return totais
+
+
+
+def entropias_e_sub_matrizes(matriz, colunas):
+    entropias = {}
+    sub_matrizes = {}
+    for atributo, valores in totais.items():
+        sub_matrizes[atributo] = {}
+        entropias[atributo] = {}
+        for valor in valores.keys():
+            sub_matrizes[atributo][valor] = []
+            entropias[atributo][valor] = 0
+            for linha in matriz:
+                for linha_val in linha:
+                    if(linha_val == valor):
+                        sub_matrizes[atributo][valor].append(linha)
+            entropias[atributo][valor] = entropia(struct(sub_matrizes[atributo][valor], colunas)[colunas[-2]])
+    return [entropias, sub_matrizes]
+
+def ganho(entropia_total, sub_matriz, entropias, totais):
+    ganho = entropia_total
+    for valor_atributo, entropia in entropias.items():
+        qtd = len(sub_matriz[valor_atributo])
+        total = totais[valor_atributo]
+        ganho -= (qtd/total)*entropia
+    return {valor_atributo: (ganho**2)**0.5}
+
+
+def ganhos(entropia_total, sub_matrizes, entropias, totais):
+    ganhos = {}
+    for atributo, valores in entropias.items():
+        ganhos[atributo] = ganho(entropia_total, sub_matrizes[atributo], entropias[atributo], totais[atributo])
+    return ganhos
+
+def ganho(entropia_total, entropias_valores, totais_valores):
+    ganho = entropia_total
+    for i in xrange(0,len(entropias_valores)):
+        proporcao = totais_valores[i]/sum(totais_valores)
+        if(proporcao!=0):
+            ganho += -proporcao*math.log(proporcao, 2)*entropias_valores[i]
+    return ganho
+
+
+pp = pprint.PrettyPrinter(indent=4)
 file = open('data', 'rb')
 linhas = file.readlines()
 colunas = trata_linha(linhas[0])[1:]
 matriz = list(map(lambda x: trata_linha(x)[1:], linhas[1:]))
-coluna_alvo = 6
+totais = struct(matriz, colunas)
+resultados = totais[colunas[-2]]
+entropia_total = entropia(resultados)
+entropias_e_sub_matrizes = entropias_e_sub_matrizes(matriz, colunas)
+entropias = entropias_e_sub_matrizes[0]
 
-def entropia(x, total):
-    print(x)
-    print(total)
-    if (x == 0 or x == total):
-       return 0
-    return -(x/total)*math.log(x/total, 2)-((total-x)/total)*math.log((total-x)/total, 2) 
-
-def possiveis_resultados(matriz, coluna_alvo):
-    possiveis_resultados = []
-    for linha in matriz:
-        for i, valor in enumerate(linha):
-            if i == coluna_alvo and valor not in possiveis_resultados:
-                possiveis_resultados.append(valor)
-    return possiveis_resultados
-
-def arvore(matriz, colunas, coluna_alvo):
-    arvore = {}
-    for resultado in possiveis_resultados(matriz, coluna_alvo):
-        arvore[resultado] = {}
-        for linha in matriz:
-            for i, valor in enumerate(linha):
-                if (i != coluna_alvo):
-                    if (colunas[i] not in arvore[resultado].keys()):
-                        arvore[resultado][colunas[i]] = {val: {"sims": 0.0, "naos": 0.0, "entropia": None, "matriz": []} for val in possiveis_resultados(matriz, i)}
-                    #     arvore[resultado][colunas[i]] = {val: {"sims": 0.0, "naos": 0.0, "entropia": None, "matriz": [linha]} for val in possiveis_resultados(matriz, i)}
-                    # else:
-                    #     arvore[resultado][colunas[i]][valor]["matriz"].append(linha)
-                    if (linha[coluna_alvo] == resultado):
-                        arvore[resultado][colunas[i]][valor]["sims"] += 1
-                    else:
-                        arvore[resultado][colunas[i]][valor]["naos"] += 1
-    for resultado in arvore.keys():
-        for coluna in arvore[resultado].keys():
-            for valor in arvore[resultado][coluna].keys():
-                node = arvore[resultado][coluna][valor]
-                total = node['sims'] + node['naos']
-                node['entropia'] = entropia(node['sims'], total)
-    return arvore
+for atributo in entropias.keys(): 
+    entropias_valores = entropias[atributo].values()
+    totais_valores = totais[atributo].values()
+    {atributo: ganho(entropia_total, entropias_valores, totais_valores)}
 
 
-pp.pprint(arvore(matriz, colunas, coluna_alvo))
-
-
-# def entropias(valores):
-#     total = sum(valores)
-#     return map(lambda x: entropia(x, total), valores)
-
-
-# # coluna_alvo = colunas[0:coluna_alvo-1]+colunas[coluna_alvo+1:len(matriz)]
-# # matriz_alvo = list(map(lambda x: x[0:coluna_alvo-1]+x[coluna_alvo+1:len(matriz)], matriz))
-
-
-# resultados = dados[colunas[-2]]
-# dados = {k: v for k, v in dados.items() if not k.startswith('7_')}
-# valores = resultados.values()
-# entropias_totais = entropias(valores)
-
-# total = sum(resultados.values())
-
-
-
-
-# for resultado, votos in resultados.items():
-#     for idx_col, atributo in enumerate(colunas):
-#         sims = filter(lambda linha: (linha[idx]) ,matriz)
-    
-#     entropia(votos, total) - (votos/total) 
-
-
-
-# def ganho(entropia_total, total, ):
-#     for val, qtd in qtd_valores.items():
-        
-
-# for entropia in entropias_totais:
-#     for col, qtd_valores in dados.items():
-#         ganho(entropia, qtd_valores, matriz)
