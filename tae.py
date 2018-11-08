@@ -67,13 +67,15 @@ def ganhos(entropias, totais, entropia_total):
             ganhos[atributo] = ganho(entropia_total, entropias_valores, totais_valores)
     return ganhos
 
-def mais_comun(lst):
-        return max(lst, key=lst.count)
+def resultado_formatado(lst):
+        mais_comun = max(lst, key=lst.count)
+        qtd = lst.count(mais_comun)
+        return str((qtd*1.0)/len(lst)) + mais_comun
 
 def calcula_branch(matriz, colunas):
     if (len(colunas) == 1):
-        return matriz
-    # if(len(matriz) == 1):
+        return resultado_formatado(matriz)
+    # if (len(matriz) == 1):
     #     return matriz
     totais = struct(matriz, colunas)
     resultados = totais['voto']
@@ -84,18 +86,18 @@ def calcula_branch(matriz, colunas):
     _ganhos = ganhos(entropias, totais, entropia_total)
     maior_ganho = max(_ganhos, key=_ganhos.get)
     if (maior_ganho == 'voto'):
-        return matriz
+        return resultado_formatado(matriz)
     arvore = {}
     index = colunas.index(maior_ganho)
     colunas = list(filter(lambda x: x != maior_ganho, colunas))
     for val in sub_matrizes[maior_ganho].keys():
         for linha in sub_matrizes[maior_ganho][val]:
-            if(len(linha)>index and maior_ganho != 'voto' and len(linha) > 1):
+            if (len(linha)>index and maior_ganho != 'voto' and len(linha) > 1):
                 linha.remove(linha[index])
         arvore[val] = calcula_branch(sub_matrizes[maior_ganho][val], colunas)
-    if(len(arvore.keys()) == 0):
-        return matriz
-    if(len(arvore.keys()) == 1):
+    if (len(arvore.keys()) == 0):
+        return resultado_formatado(matriz)
+    if (len(arvore.keys()) == 1):
         return arvore[arvore.keys()[0]]
     return arvore
 
