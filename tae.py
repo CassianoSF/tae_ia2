@@ -72,8 +72,7 @@ def mais_comun(lst):
 
 def calcula_branch(matriz, colunas):
     if (len(colunas) == 1):
-        print("len(colunas) == 1")
-        return mais_comun(matriz)
+        return matriz
     # if(len(matriz) == 1):
     #     return matriz
     totais = struct(matriz, colunas)
@@ -84,6 +83,8 @@ def calcula_branch(matriz, colunas):
     sub_matrizes = ent_sub[1]
     _ganhos = ganhos(entropias, totais, entropia_total)
     maior_ganho = max(_ganhos, key=_ganhos.get)
+    if (maior_ganho == 'voto'):
+        return matriz
     arvore = {}
     index = colunas.index(maior_ganho)
     colunas = list(filter(lambda x: x != maior_ganho, colunas))
@@ -93,12 +94,9 @@ def calcula_branch(matriz, colunas):
                 linha.remove(linha[index])
         arvore[val] = calcula_branch(sub_matrizes[maior_ganho][val], colunas)
     if(len(arvore.keys()) == 0):
-        print("len(arvore.keys()) == 0")
-        return mais_comun(matriz)
+        return matriz
     if(len(arvore.keys()) == 1):
-        print("len(arvore.keys()) == 1")
         return arvore[arvore.keys()[0]]
-    print("arvore")
     return arvore
 
 
