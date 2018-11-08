@@ -70,7 +70,7 @@ def ganhos(entropias, totais, entropia_total):
 def resultado_formatado(lst):
         mais_comun = max(lst, key=lst.count)
         qtd = lst.count(mais_comun)
-        return str((qtd*1.0)/len(lst)) + mais_comun
+        return str((qtd*1.0)/len(lst)*100) + "% "+ mais_comun[0]
 
 def calcula_branch(matriz, colunas):
     if (len(colunas) == 1):
