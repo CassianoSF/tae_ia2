@@ -4,7 +4,8 @@ import math
 import pprint
 
 def trata_linha(linha):
-    return linha.replace("\"", "").replace("\n", "").replace("ã", "a").replace("ç", "c").replace("í", "i").replace("é", "e").replace("ó", "o").split(",")
+    vals = linha.replace("\"", "").replace("\n", "").replace("ã", "a").replace("ç", "c").replace("í", "i").replace("é", "e").replace("ó", "o").split(",")
+    return [val.strip() for val in vals] 
 
 def totais_col(idx, matriz):
     totais = []
@@ -32,27 +33,22 @@ def struct(matriz, colunas):
 
 
 
-def entropias_e_sub_matrizes(matriz, colunas):
+def entropias_e_sub_matrizes(matriz, colunas, totais):
     entropias = {}
     sub_matrizes = {}
     for atributo, valores in totais.items():
-        sub_matrizes[atributo] = {}
-        entropias[atributo] = {}
-        for valor in valores.keys():
-            sub_matrizes[atributo][valor] = []
-            entropias[atributo][valor] = 0
-            for linha in matriz:
-                for linha_val in linha:
-                    if(linha_val == valor):
-                        sub_matrizes[atributo][valor].append(linha)
-            entropias[atributo][valor] = entropia(struct(sub_matrizes[atributo][valor], colunas)[colunas[-2]])
+        if(atributo != 'voto'):
+            sub_matrizes[atributo] = {}
+            entropias[atributo] = {}
+            for valor in valores.keys():
+                sub_matrizes[atributo][valor] = []
+                entropias[atributo][valor] = 0
+                for linha in matriz:
+                    for linha_val in linha:
+                        if(linha_val == valor):
+                            sub_matrizes[atributo][valor].append(linha)
+                entropias[atributo][valor] = entropia(struct(sub_matrizes[atributo][valor], colunas)[colunas[-2]])
     return [entropias, sub_matrizes]
-
-def ganhos(entropia_total, sub_matrizes, entropias, totais):
-    ganhos = {}
-    for atributo, valores in entropias.items():
-        ganhos[atributo] = ganho(entropia_total, sub_matrizes[atributo], entropias[atributo], totais[atributo])
-    return ganhos
 
 def ganho(entropia_total, entropias_valores, totais_valores):
     ganho = entropia_total
@@ -64,11 +60,47 @@ def ganho(entropia_total, entropias_valores, totais_valores):
 
 def ganhos(entropias, totais, entropia_total):
     ganhos = {}
-    for atributo in entropias.keys(): 
-        entropias_valores = entropias[atributo].values()
-        totais_valores = totais[atributo].values()
-        ganhos[atributo] = ganho(entropia_total, entropias_valores, totais_valores)
+    for atributo in entropias.keys():
+        if(atributo != 'voto'):
+            entropias_valores = entropias[atributo].values()
+            totais_valores = totais[atributo].values()
+            ganhos[atributo] = ganho(entropia_total, entropias_valores, totais_valores)
     return ganhos
+
+def mais_comun(lst):
+        return max(lst, key=lst.count)
+
+def calcula_branch(matriz, colunas):
+    if (len(colunas) == 1):
+        print("len(colunas) == 1")
+        return mais_comun(matriz)
+    # if(len(matriz) == 1):
+    #     return matriz
+    totais = struct(matriz, colunas)
+    resultados = totais['voto']
+    entropia_total = entropia(resultados)
+    ent_sub = entropias_e_sub_matrizes(matriz, colunas, totais)
+    entropias = ent_sub[0]
+    sub_matrizes = ent_sub[1]
+    _ganhos = ganhos(entropias, totais, entropia_total)
+    maior_ganho = max(_ganhos, key=_ganhos.get)
+    arvore = {}
+    index = colunas.index(maior_ganho)
+    colunas = list(filter(lambda x: x != maior_ganho, colunas))
+    for val in sub_matrizes[maior_ganho].keys():
+        for linha in sub_matrizes[maior_ganho][val]:
+            if(len(linha)>index and maior_ganho != 'voto' and len(linha) > 1):
+                linha.remove(linha[index])
+        arvore[val] = calcula_branch(sub_matrizes[maior_ganho][val], colunas)
+    if(len(arvore.keys()) == 0):
+        print("len(arvore.keys()) == 0")
+        return mais_comun(matriz)
+    if(len(arvore.keys()) == 1):
+        print("len(arvore.keys()) == 1")
+        return arvore[arvore.keys()[0]]
+    print("arvore")
+    return arvore
+
 
 def ap(s):
     pp.pprint(s)
@@ -78,11 +110,5 @@ file = open('data', 'rb')
 linhas = file.readlines()
 colunas = trata_linha(linhas[0])[1:]
 matriz = list(map(lambda x: trata_linha(x)[1:], linhas[1:]))
-totais = struct(matriz, colunas)
-resultados = totais[colunas[-2]]
-entropia_total = entropia(resultados)
-entropias_e_sub_matrizes = entropias_e_sub_matrizes(matriz, colunas)
-entropias = entropias_e_sub_matrizes[0]
-
-ganhos = ganhos(entropias, totais, entropia_total)
-max(ganhos, key=ganhos.get)
+arvore = calcula_branch(matriz, colunas)
+ap(arvore)
