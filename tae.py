@@ -48,15 +48,6 @@ def entropias_e_sub_matrizes(matriz, colunas):
             entropias[atributo][valor] = entropia(struct(sub_matrizes[atributo][valor], colunas)[colunas[-2]])
     return [entropias, sub_matrizes]
 
-def ganho(entropia_total, sub_matriz, entropias, totais):
-    ganho = entropia_total
-    for valor_atributo, entropia in entropias.items():
-        qtd = len(sub_matriz[valor_atributo])
-        total = totais[valor_atributo]
-        ganho -= (qtd/total)*entropia
-    return {valor_atributo: (ganho**2)**0.5}
-
-
 def ganhos(entropia_total, sub_matrizes, entropias, totais):
     ganhos = {}
     for atributo, valores in entropias.items():
@@ -71,6 +62,16 @@ def ganho(entropia_total, entropias_valores, totais_valores):
             ganho += -proporcao*math.log(proporcao, 2)*entropias_valores[i]
     return ganho
 
+def ganhos(entropias, totais, entropia_total):
+    ganhos = {}
+    for atributo in entropias.keys(): 
+        entropias_valores = entropias[atributo].values()
+        totais_valores = totais[atributo].values()
+        ganhos[atributo] = ganho(entropia_total, entropias_valores, totais_valores)
+    return ganhos
+
+def ap(s):
+    pp.pprint(s)
 
 pp = pprint.PrettyPrinter(indent=4)
 file = open('data', 'rb')
@@ -83,9 +84,5 @@ entropia_total = entropia(resultados)
 entropias_e_sub_matrizes = entropias_e_sub_matrizes(matriz, colunas)
 entropias = entropias_e_sub_matrizes[0]
 
-for atributo in entropias.keys(): 
-    entropias_valores = entropias[atributo].values()
-    totais_valores = totais[atributo].values()
-    {atributo: ganho(entropia_total, entropias_valores, totais_valores)}
-
-
+ganhos = ganhos(entropias, totais, entropia_total)
+max(ganhos, key=ganhos.get)
