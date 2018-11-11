@@ -3,9 +3,9 @@
 import math
 import pprint
 
-# from sklearn.datasets import load_breast_cancer
-# from id3 import Id3Estimator
-# from id3 import export_graphviz
+from sklearn.datasets import load_breast_cancer
+from id3 import Id3Estimator
+from id3 import export_graphviz
 
 # remove utf-8, tira espaços, quebra por ','
 def trata_linha(linha):
@@ -138,38 +138,37 @@ linhas = file.readlines()
 colunas = trata_linha(linhas[0])[1:]                         # coluna de atributos sem datahora
 matriz = list(map(lambda x: trata_linha(x)[1:], linhas[1:])) # matriz de respostas sem datahora
 arvore = calcula_branch(matriz, colunas)
-
-
-
-# TESTE.. não funcionou
-
-# file = open('data', 'rb')
-# linhas = file.readlines()
-# colunas = trata_linha(linhas[0])[1:]
-# matriz = list(map(lambda x: trata_linha(x)[1:], linhas[1:]))
-# totais = quantidades(matriz, colunas)
-
-# valores = [attr.keys() for attr in totais.values()]
-# valores_i = [[{val: i} for i, val in enumerate(attr)] for attr in valores]
-# flat = [i for sublist in valores_i for i in sublist]
-# numero_do_valor = {}
-# numero_do_resultados = {res: i for i, res in enumerate(totais['voto'].keys())}
-# for d in flat:
-#     numero_do_valor.update(d)
-
-# data = [[numero_do_valor[valor] for valor in linha] for linha in matriz]
-# target = []
-# for linha in matriz: 
-#     for i, resultado in enumerate(linha):
-#         if i == colunas.index('voto'):
-#             target.append(numero_do_resultados[resultado])
-
-# # data = np.array([np.array(i) for i in data])
-# # target = np.array(target)
-# bunch = load_breast_cancer()
-# estimator = Id3Estimator()
-# estimator.fit(data,target)
-# export_graphviz(estimator.tree_, 'tree.dot', bunch.feature_names)
-
-
 ap(arvore)
+
+
+# TESTE
+file = open('data', 'rb')
+linhas = file.readlines()
+colunas = trata_linha(linhas[0])[1:]
+matriz = list(map(lambda x: trata_linha(x)[1:], linhas[1:]))
+totais = quantidades(matriz, colunas)
+
+valores = [attr.keys() for attr in totais.values()]
+valores_i = [[{val: i} for i, val in enumerate(attr)] for attr in valores]
+flat = [i for sublist in valores_i for i in sublist]
+numero_do_valor = {}
+numero_do_resultados = {res: i for i, res in enumerate(totais['voto'].keys())}
+for d in flat:
+    numero_do_valor.update(d)
+
+data = []
+for linha in matriz:
+    for i, valor in enumerate(linha):
+        if i != colunas.index('voto')
+            data.append(numero_do_valor[valor])
+
+target = []
+for linha in matriz: 
+    for i, resultado in enumerate(linha):
+        if i == colunas.index('voto'):
+            target.append(numero_do_resultados[resultado])
+
+bunch = load_breast_cancer()
+estimator = Id3Estimator()
+estimator.fit(data[:-1],target)
+export_graphviz(estimator.tree_, 'tree.dot', colunas)
