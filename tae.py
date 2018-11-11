@@ -156,11 +156,13 @@ numero_do_resultados = {res: i for i, res in enumerate(totais['voto'].keys())}
 for d in flat:
     numero_do_valor.update(d)
 
-data = []
+data = [] 
 for linha in matriz:
-    for i, valor in enumerate(linha):
-        if i != colunas.index('voto')
-            data.append(numero_do_valor[valor])
+    sub_data = []
+    for i, val in enumerate(linha):
+        if i != colunas.index('voto'):
+             sub_data.append(numero_do_valor[val])
+    data.append(sub_data)
 
 target = []
 for linha in matriz: 
@@ -171,4 +173,6 @@ for linha in matriz:
 bunch = load_breast_cancer()
 estimator = Id3Estimator()
 estimator.fit(data[:-1],target)
+colunas.remove('voto')
 export_graphviz(estimator.tree_, 'tree.dot', colunas)
+
