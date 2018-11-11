@@ -1,0 +1,15 @@
+Dia, Aspecto, Temp,    Humidade,  Vento, Joga
+D1,  Sol,     Quente,  Elevada,   Fraco, Nao   
+D2,  Sol,     Quente,  Elevada,   Forte, Nao   
+D3,  Nuvem,   Quente,  Elevada,   Fraco, Sim   
+D4,  Chuva,   Ameno,   Elevada,   Fraco, Sim   
+D5,  Chuva,   Fresco,  Normal,    Forte, Sim   
+D6,  Chuva,   Fresco,  Normal,    Fraco, Nao   
+D7,  Nuvem,   Fresco,  Normal,    Fraco, Sim   
+D8,  Sol,     Ameno,   Elevada,   Fraco, Nao   
+D9,  Sol,     Fresco,  Normal,    Forte, Sim   
+D10, Chuva,   Ameno,   Normal,    Forte, Sim   
+D11, Sol,     Ameno,   Normal,    Forte, Sim   
+D12, Nuvem,   Ameno,   Elevada,   Forte, Sim   
+D13, Nuvem,   Quente,  Normal,    Fraco, Sim   
+D14, Chuva,   Ameno,   Elevada,   Forte, Nao   
