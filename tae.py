@@ -27,8 +27,6 @@ def entropia(resultados):
 # recebe a entropia total da matriz, entropia dos valores do atributo, e quantidades dos valores na matriz
 def ganho(entropia_total, entropias_valores, quanidades_valores):
     ganho = entropia_total
-    ap(entropias_valores)
-    ap(quanidades_valores)
     for i in xrange(0,len(entropias_valores)):
         proporcao = quanidades_valores[i]/sum(quanidades_valores)
         if(proporcao!=0):
@@ -69,7 +67,7 @@ def entropias_e_sub_matrizes(matriz, colunas, totais):
     entropias = {}
     sub_matrizes = {}
     for atributo, valores in totais.items():
-        if(atributo != 'Joga'):
+        if(atributo != 'voto'):
             sub_matrizes[atributo] = {}
             entropias[atributo] = {}
             for valor in valores.keys():
@@ -79,7 +77,7 @@ def entropias_e_sub_matrizes(matriz, colunas, totais):
                     for linha_val in linha:
                         if(linha_val == valor):
                             sub_matrizes[atributo][valor].append(linha)
-                entropias[atributo][valor] = entropia(quantidades(sub_matrizes[atributo][valor], colunas)['Joga'])
+                entropias[atributo][valor] = entropia(quantidades(sub_matrizes[atributo][valor], colunas)['voto'])
     return [entropias, sub_matrizes]
 
 
@@ -87,7 +85,7 @@ def entropias_e_sub_matrizes(matriz, colunas, totais):
 def ganhos(entropias, totais, entropia_total):
     ganhos = {}
     for atributo in entropias.keys():
-        if(atributo != 'Joga'):
+        if(atributo != 'voto'):
             entropias_valores = entropias[atributo].values()
             quanidades_valores = totais[atributo].values()
             ganhos[atributo] = ganho(entropia_total, entropias_valores, quanidades_valores)
@@ -107,22 +105,21 @@ def calcula_branch(matriz, colunas):
     # if (len(matriz) == 1):
     #     return matriz
     totais = quantidades(matriz, colunas)
-    resultados = totais['Joga']
+    resultados = totais['voto']
     entropia_total = entropia(resultados)
     ent_sub = entropias_e_sub_matrizes(matriz, colunas, totais)
     entropias = ent_sub[0]
     sub_matrizes = ent_sub[1]
     _ganhos = ganhos(entropias, totais, entropia_total)
     maior_ganho = max(_ganhos, key=_ganhos.get) # nome do atributo com maior ganho do nó
-    ap(maior_ganho)
-    if (maior_ganho == 'Joga'):
+    if (maior_ganho == 'voto'):
         return resultado_formatado(matriz)
     arvore = {}
     index = colunas.index(maior_ganho)
     colunas = list(filter(lambda x: x != maior_ganho, colunas))
     for val in sub_matrizes[maior_ganho].keys():
         for linha in sub_matrizes[maior_ganho][val]:
-            if (len(linha)>index and maior_ganho != 'Joga' and len(linha) > 1):
+            if (len(linha)>index and maior_ganho != 'voto' and len(linha) > 1):
                 linha.remove(linha[index])
         arvore[val] = calcula_branch(sub_matrizes[maior_ganho][val], colunas)
     if (len(arvore.keys()) == 0):
@@ -136,7 +133,7 @@ def ap(s):
     pp.pprint(s)
 
 pp = pprint.PrettyPrinter(indent=4)
-file = open('teste2', 'rb')
+file = open('data', 'rb')
 linhas = file.readlines()
 colunas = trata_linha(linhas[0])[1:]                         # coluna de atributos sem datahora
 matriz = list(map(lambda x: trata_linha(x)[1:], linhas[1:])) # matriz de respostas sem datahora
@@ -145,7 +142,7 @@ ap(arvore)
 
 
 # TESTE
-file = open('teste2', 'rb')
+file = open('data', 'rb')
 linhas = file.readlines()
 colunas = trata_linha(linhas[0])[1:]
 matriz = list(map(lambda x: trata_linha(x)[1:], linhas[1:]))
@@ -155,7 +152,7 @@ valores = [attr.keys() for attr in totais.values()]
 valores_i = [[{val: i} for i, val in enumerate(attr)] for attr in valores]
 flat = [i for sublist in valores_i for i in sublist]
 numero_do_valor = {}
-numero_do_resultados = {res: i for i, res in enumerate(totais['Joga'].keys())}
+numero_do_resultados = {res: i for i, res in enumerate(totais['voto'].keys())}
 for d in flat:
     numero_do_valor.update(d)
 
@@ -163,19 +160,20 @@ data = []
 for linha in matriz:
     sub_data = []
     for i, val in enumerate(linha):
-        if i != colunas.index('Joga'):
+        if i != colunas.index('voto'):
              sub_data.append(numero_do_valor[val])
     data.append(sub_data)
 
 target = []
 for linha in matriz: 
     for i, resultado in enumerate(linha):
-        if i == colunas.index('Joga'):
+        if i == colunas.index('voto'):
             target.append(numero_do_resultados[resultado])
 
 bunch = load_breast_cancer()
 estimator = Id3Estimator()
-estimator.fit(data,target)
-colunas.remove('Joga')
+estimator.fit(data[:-1],target)
+# estimator.fit(data,target)
+colunas.remove('voto')
 export_graphviz(estimator.tree_, 'tree.dot', colunas)
 
