@@ -2,6 +2,8 @@
 import SimpleHTTPServer
 import SocketServer
 
+import webbrowser
+ 
 import math
 import pprint
 
@@ -162,17 +164,14 @@ with open('data_tree.json', 'w') as fp:
     json.dump(fomratado, fp)
 
 
+chrome_path = 'open -a /Applications/Google\ Chrome.app %s'
 PORT = 80
-
 Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
 httpd = SocketServer.TCPServer(("", PORT), Handler)
- 
 print "servidor web na porta ", PORT
-httpd.serve_forever()
+httpd.serve_forever() 
 
-
-
-
+webbrowser.get(chrome_path).open("http://localhost")
 
 # TESTE
 file = open('data', 'rb')
