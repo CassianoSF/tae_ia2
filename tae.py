@@ -3,7 +3,7 @@ import SimpleHTTPServer
 import SocketServer
 
 import webbrowser
- 
+import json 
 import math
 import pprint
 
@@ -145,67 +145,72 @@ arvore = calcula_branch(matriz, colunas)
 print(arvore)
 
 
-def formataArvore(arvore, _key):
-    formatado = {}
-    formatado['children'] = []
-    formatado['name'] = _key
-    for key in arvore.keys():
-        if type(arvore[key]) is dict:
-            formatado['children'].append(formataArvore(arvore[key], key))
-        else:
-            formatado['children'].append({'name': key, 'children': [{'name': arvore[key]}]})
-    return formatado
+formatado = {'nodes': [{'id': 1, 'label': 'NODO ORIGEM!!!'}], 'edges': []}
+next_id = 1
 
-fomratado = formataArvore(arvore, "origem")
 
-import json
+def formataArvore(arvore, last_id):
+    global next_id
+    if type(arvore) is dict:
+        for key in arvore.keys():
+            next_id += 1
+            formatado['nodes'].append({'id': next_id, 'label': key})
+            formatado['edges'].append({'from': last_id, 'to': next_id})
+            formataArvore(arvore[key], next_id)
+    else:
+        next_id += 1
+        formatado['nodes'].append({'id': next_id, 'label': arvore})
+        formatado['edges'].append({'from': last_id, 'to': next_id})
+
+
+formataArvore(arvore, 1)
+ap(formatado)
 
 with open('data_tree.json', 'w') as fp:
-    json.dump(fomratado, fp)
+    json.dump(formatado, fp)
 
 
-chrome_path = 'open -a /Applications/Google\ Chrome.app %s'
 PORT = 80
 Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
 httpd = SocketServer.TCPServer(("", PORT), Handler)
-print "servidor web na porta ", PORT
+print "servidor web em http://localhost"
+
 httpd.serve_forever() 
 
-webbrowser.get(chrome_path).open("http://localhost")
 
-# TESTE
-file = open('data', 'rb')
-linhas = file.readlines()
-colunas = trata_linha(linhas[0])[1:]
-matriz = list(map(lambda x: trata_linha(x)[1:], linhas[1:]))
-totais = quantidades(matriz, colunas)
+# # TESTE
+# file = open('data', 'rb')
+# linhas = file.readlines()
+# colunas = trata_linha(linhas[0])[1:]
+# matriz = list(map(lambda x: trata_linha(x)[1:], linhas[1:]))
+# totais = quantidades(matriz, colunas)
 
-valores = [attr.keys() for attr in totais.values()]
-valores_i = [[{val: i} for i, val in enumerate(attr)] for attr in valores]
-flat = [i for sublist in valores_i for i in sublist]
-numero_do_valor = {}
-numero_do_resultados = {res: i for i, res in enumerate(totais['voto'].keys())}
-for d in flat:
-    numero_do_valor.update(d)
+# valores = [attr.keys() for attr in totais.values()]
+# valores_i = [[{val: i} for i, val in enumerate(attr)] for attr in valores]
+# flat = [i for sublist in valores_i for i in sublist]
+# numero_do_valor = {}
+# numero_do_resultados = {res: i for i, res in enumerate(totais['voto'].keys())}
+# for d in flat:
+#     numero_do_valor.update(d)
 
-data = [] 
-for linha in matriz:
-    sub_data = []
-    for i, val in enumerate(linha):
-        if i != colunas.index('voto'):
-             sub_data.append(numero_do_valor[val])
-    data.append(sub_data)
+# data = [] 
+# for linha in matriz:
+#     sub_data = []
+#     for i, val in enumerate(linha):
+#         if i != colunas.index('voto'):
+#              sub_data.append(numero_do_valor[val])
+#     data.append(sub_data)
 
-target = []
-for linha in matriz: 
-    for i, resultado in enumerate(linha):
-        if i == colunas.index('voto'):
-            target.append(numero_do_resultados[resultado])
+# target = []
+# for linha in matriz: 
+#     for i, resultado in enumerate(linha):
+#         if i == colunas.index('voto'):
+#             target.append(numero_do_resultados[resultado])
 
-bunch = load_breast_cancer()
-estimator = Id3Estimator()
-estimator.fit(data[:-1],target)
-# estimator.fit(data,target)
-colunas.remove('voto')
-export_graphviz(estimator.tree_, 'tree.dot', colunas)
+# bunch = load_breast_cancer()
+# estimator = Id3Estimator()
+# estimator.fit(data[:-1],target)
+# # estimator.fit(data,target)
+# colunas.remove('voto')
+# export_graphviz(estimator.tree_, 'tree.dot', colunas)
 

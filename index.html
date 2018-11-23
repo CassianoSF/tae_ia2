@@ -1,20 +1,23 @@
-<!DOCTYPE html>
-<html style="height: 100%">
-   <head>
-       <meta charset="utf-8">
-   </head>
-   <body style="height: 100%; margin: 0">
-       <div id="container" style="height: 100%"></div>
-       <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/echarts.min.js"></script>
-       <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts-gl/echarts-gl.min.js"></script>
-       <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts-stat/ecStat.min.js"></script>
-       <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/extension/dataTool.min.js"></script>
-       <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/map/js/china.js"></script>
-       <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/map/js/world.js"></script>
-       <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=ZUONbpqGBsYGXNIYHicvbAbM"></script>
-       <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/extension/bmap.min.js"></script>
-       <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/simplex.js"></script>
-       <script type="text/javascript">
+<!doctype html>
+<html>
+<head>
+  <title>Arvore de decisão</title>
+
+  <script type="text/javascript" src="./vis.js"></script>
+  <link href="./network.css" rel="stylesheet" type="text/css" />
+
+  <style type="text/css">
+    #mynetwork {
+      width: 1600px;
+      height: 1400px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="mynetwork"></div>
+
+<script type="text/javascript">
 
 
 
@@ -32,75 +35,23 @@ function loadJSON(callback) {
 }
 
 loadJSON((response) => {
-  // Parse JSON string into object
-  var data = JSON.parse(response);
+  // create an array with nodes
+  var nodes = new vis.DataSet(JSON.parse(response).nodes);
+
+  // create an array with edges
+  var edges = new vis.DataSet(JSON.parse(response).edges);
+
+  // create a network
+  var container = document.getElementById('mynetwork');
+  var data = {
+    nodes: nodes,
+    edges: edges
+  };
+  var options = {};
+  var network = new vis.Network(container, data, options);
+})
+</script>
 
 
-
-  var dom = document.getElementById("container");
-  var myChart = echarts.init(dom);
-  var app = {};
-  option = null;
-
-
-
-  myChart.hideLoading();
-
-  myChart.setOption(option = {
-      tooltip: {
-          trigger: 'item',
-          triggerOn: 'mousemove'
-      },
-      series:[
-          {
-              type: 'tree',
-
-              data: [data],
-
-              left: '2%',
-              right: '2%',
-              top: '8%',
-              bottom: '20%',
-
-              symbol: 'emptyCircle',
-
-              orient: 'vertical',
-
-              expandAndCollapse: false,
-
-              label: {
-                  normal: {
-                      position: 'top',
-                      rotate: -90,
-                      verticalAlign: 'middle',
-                      align: 'right',
-                      fontSize: 12
-                  }
-              },
-
-              leaves: {
-                  label: {
-                      normal: {
-                          position: 'bottom',
-                          rotate: -90,
-                          verticalAlign: 'middle',
-                          align: 'left'
-                      }
-                  }
-              },
-
-              animationDurationUpdate: 750
-          }
-      ]
-  });
-
-  if (option && typeof option === "object") {
-      myChart.setOption(option, true);
-  }
-
-
-});
-
-       </script>
-   </body>
+</body>
 </html>
