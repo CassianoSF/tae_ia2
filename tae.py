@@ -175,7 +175,12 @@ Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
 httpd = SocketServer.TCPServer(("", PORT), Handler)
 print "servidor web em http://localhost"
 
-httpd.serve_forever() 
+try:
+    httpd.serve_forever() 
+except KeyboardInterrupt:
+    pass
+finally:
+    httpd.server_close()
 
 
 # # TESTE
