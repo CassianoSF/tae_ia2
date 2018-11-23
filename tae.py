@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import SimpleHTTPServer
+import SocketServer
 
 import math
 import pprint
@@ -138,7 +140,38 @@ linhas = file.readlines()
 colunas = trata_linha(linhas[0])[1:]                         # coluna de atributos sem datahora
 matriz = list(map(lambda x: trata_linha(x)[1:], linhas[1:])) # matriz de respostas sem datahora
 arvore = calcula_branch(matriz, colunas)
-ap(arvore)
+print(arvore)
+
+
+def formataArvore(arvore, _key):
+    formatado = {}
+    formatado['children'] = []
+    formatado['name'] = _key
+    for key in arvore.keys():
+        if type(arvore[key]) is dict:
+            formatado['children'].append(formataArvore(arvore[key], key))
+        else:
+            formatado['children'].append({'name': key, 'children': [{'name': arvore[key]}]})
+    return formatado
+
+fomratado = formataArvore(arvore, "origem")
+
+import json
+
+with open('data_tree.json', 'w') as fp:
+    json.dump(fomratado, fp)
+
+
+PORT = 80
+
+Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
+httpd = SocketServer.TCPServer(("", PORT), Handler)
+ 
+print "servidor web na porta ", PORT
+httpd.serve_forever()
+
+
+
 
 
 # TESTE
